@@ -57,12 +57,25 @@
 	<section class="slide">
 		<h2>要有資料</h2>
 		<ol>
-			<li class="next">所有與新聞相關的資料都要放入 cnYes 的 Elasticsearch</li>
+			<li class="next">
+				所有與新聞相關的資料都要放入 cnYes 的 Elasticsearch
 				<ol>
 					<li class="next">新聞本身</li>
 					<li class="next">新聞圖片/新聞數據/新聞類別/...</li>
 					<li class="next">總共 7 張 Table</li>
 				</ol>
+			</li>
+			<li class="next">
+				Indexing
+				<ol>
+					<li class="next">規劃資料結構，做 Mapping</li>
+					<li class="next">
+						把資料寫入 Elasticsearch
+						<ol>
+							<li class="next">Analyzer</li>
+							<li class="next">Inverted Index</li>
+						</ol>
+					</li>
 			</li>
 		</ol>
 		<style>
@@ -75,16 +88,19 @@
 		</style>
 	</section>
 	<section class="slide">
-		<h2>規劃資料的 Mapping</h2>
+		<img src="pictures/analyzer.png" class="cover">
+	</section>
+	<section class="slide">
+		<h2>決定資料結構: Mapping</h2>
 		<ol>
 			<li class="next">搜尋先覺: 一切以 搜尋 好寫為優先</li>
-			<li class="next">扁平化的資料庫</li>
+			<li class="next"><mark>扁平化</mark> 的資料呈現</li>
 		</ol>
 	</section>
 	<section class="slide">
-		<h2>規劃資料的 Mapping: 扁平化</h2>
+		<h2>決定資料結構: Mapping</h2>
 		<ol>
-			<li class="next">例子 1: 不扁平的 mapping</li>
+			<li class="next">例子 1: 不扁平的資料呈現 - 資料</li>
 		</ol>
 		<pre class="next">
 			<code>{</code>
@@ -104,9 +120,9 @@
 		</style>
 	</section>
 	<section class="slide">
-		<h2>規劃資料的 Mapping: 扁平化</h2>
+		<h2>決定資料結構: Mapping</h2>
 		<ol>
-			<li>例子 1: 不扁平的搜尋方法</li>
+			<li>例子 1: 不扁平的資料呈現 - 搜尋</li>
 		</ol>
 		<pre class="next">
 			<code>POST /_search</code>
@@ -134,9 +150,9 @@
 		</style>
 	</section>
 	<section class="slide">
-		<h2>規劃資料的 Mapping: 扁平化</h2>
+		<h2>決定資料結構: Mapping</h2>
 		<ol>
-			<li>例子 2: 扁平的 mapping</li>
+			<li>例子 2: 扁平的資料呈現 - 資料</li>
 		</ol>
 		<pre class="next">
 			<code>{</code>
@@ -154,9 +170,9 @@
 		</style>
 	</section>
 	<section class="slide">
-		<h2>規劃資料的 Mapping: 扁平化</h2>
+		<h2>決定資料結構: Mapping</h2>
 		<ol>
-			<li>例子 2: 扁平化後的搜尋方法</li>
+			<li>例子 2: 扁平的資料呈現 - 搜尋</li>
 		</ol>
 		<pre class="next">
 			<code>{</code>
@@ -189,10 +205,12 @@
 		<h2>一些關於 Mapping 的小事情</h2>
 		<ol>
 			<li class="next">扁不扁平看開發需求</li>
-			<li class="next">需不需要做 tokenized 看搜尋需求</li>
-			<ol>
-				<li class="next">name, code, position 需要被<mark>分析</mark>嗎?</li>
-			</ol>
+			<li class="next">
+				特定欄位需不需要做<mark>分析</mark>看搜尋需求
+				<ol>
+					<li class="next">name/code/position 需要被<mark>分析</mark>嗎?</li>
+				</ol>
+			</li>
 		</ol>
 		<pre class="next">
 			<code>{</code>
@@ -226,15 +244,20 @@
 		<h2>一些關於 Mapping 的小事情</h2>
 		<ol>
 			<li>扁不扁平看開發需求</li>
-			<li>需不需要做 tokenized 看搜尋需求</li>
+			<li>特定欄位需不需要做<mark>分析</mark>看搜尋需求
+				<ol>
+					<li>name/code/position 需要被<mark>分析</mark>嗎?</li>
+				</ol>
+			</li>
+			<li class="next">搜尋先覺是否都要屏棄 Nested Type?</li>
 			<ol>
-				<li>name, code, position 需要被<mark>分析</mark>嗎?</li>
-			</ol>
-			<li class="next">搜尋先覺是否都用不到 Nested Mapping?</li>
-			<ol>
-				<li class="next">Nested Object 內的屬性是有關聯的</li>
-				<li class="next">例子: 把姓氏跟名子分開存時, 兩者存在強烈關聯</li>
-				<li class="next">王思平 !== 陳思平</li>
+				<li class="next">Nested 內的屬性是有關聯的</li>
+				<li class="next">
+					例子: 把姓氏跟名子分開存時，兩者便存在強烈關聯
+					<ol>
+						<li class="next"><code>王思平 !== 陳思平</code></li>
+					</ol>
+				</li>
 				<li class="next"><a href="http://joelabrahamsson.com/elasticsearch-nested-mapping-and-filter/">http://joelabrahamsson.com/elasticsearch-nested-mapping-and-filter/</a></li>
 			</ol>
 		</ol>
@@ -250,17 +273,21 @@
 	<section class="slide">
 		<h2>一些關於 Indexing 的小事情</h2>
 		<ol>
-			<li class="next">已經上線的資料</li>
-			<ol>
-				<li class="next">不!不!不!</li>
-				<li class="next">能!能!能!</li>
-				<li class="next">砍!砍!砍!</li>
-			</ol>
-			<li class="next">Hot-Plugging</li>
-			<ol>
-				<li class="next">外面怎麼看都是同一個 Index</li>
-				<li class="next"><a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-aliases.html">Alias</a></li>
-			</ol>
+			<li class="next">
+				已經上線的資料
+				<ol>
+					<li class="next">不!不!不!</li>
+					<li class="next">能!能!能!</li>
+					<li class="next">砍!砍!砍!</li>
+				</ol>
+			</li>
+			<li class="next">
+				如何在重新做 Indexing 時不影響線上搜尋運作？
+				<ol>
+					<li class="next">關鍵: 讓外面怎麼看都是同一個 Index</li>
+					<li class="next">解決: 建立 <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-aliases.html">Alias</a></li>
+				</ol>
+			</li>
 		</ol>
 		<style>
 			ol ol {
@@ -370,11 +397,13 @@
 			<li>改搜尋<mark>台積電</mark>試試看</li>
 			<li>中文斷詞的難處</li>
 			<li>使用<mark>_analyzer</mark>測試斷詞</li>
-			<li class="next">解決中文斷詞: 更改分析方式</li>
-			<ol>
-				<li class="next">使用<mark>IK Analysis for Elasticsearch</mark></li>
-				<li class="next"><a href="https://github.com/medcl/elasticsearch-analysis-ik">https://github.com/medcl/elasticsearch-analysis-ik</a></li>
-			</ol>
+			<li class="next">
+				解決中文斷詞: 更改分析方式
+				<ol>
+					<li class="next">使用<mark>IK Analysis for Elasticsearch</mark></li>
+					<li class="next"><a href="https://github.com/medcl/elasticsearch-analysis-ik">https://github.com/medcl/elasticsearch-analysis-ik</a></li>
+				</ol>
+			</li>
 		</ol>
 		<pre class="next">
 			<code>curl -XGET localhost:9200/sharing/_analyze?tokenizer=ik_smart -d '台積電'</code>
@@ -398,12 +427,25 @@
 		<h2>Query DSL - 全文搜尋</h2>
 		<ol>
 			<li class="next">改搜尋<mark>林全</mark>試試看</li>
-			<li class="next">使用<mark>_analyzer</mark>測試斷詞</li>
-			<ol>
-				<li class="next">地區性的慣用詞</li>
-			</ol>
+	</section>
+	<section class="slide">
+		<img src="pictures/analyze3.jpg" class="cover">
+	</section>
+	<section class="slide">
+		<img src="pictures/analyze2.png" class="cover">
+	</section>
+	<section class="slide">
+		<h2>Query DSL - 全文搜尋</h2>
+		<ol>
+			<li>改搜尋<mark>林全</mark>試試看</li>
+			<li>
+				使用<mark>_analyzer</mark>測試斷詞
+				<ol>
+					<li>地區性的慣用詞</li>
+				</ol>
+			</li>
 		</ol>
-		<pre class="next">
+		<pre>
 			<code>curl -XGET localhost:9200/sharing/_analyze?tokenizer=ik_smart -d '林全'</code>
 		</pre>
 		<style>
@@ -419,12 +461,6 @@
 		</style>
 	</section>
 	<section class="slide">
-		<img src="pictures/analyze2.png" class="cover">
-	</section>
-	<section class="slide">
-		<img src="pictures/analyze3.jpg" class="cover">
-	</section>
-	<section class="slide">
 		<h2>Query DSL - 全文搜尋</h2>
 		<ol>
 			<li>改搜尋<mark>林全</mark>試試看</li>
@@ -432,7 +468,7 @@
 			<ol>
 				<li>地區性的慣用詞</li>
 				<li class="next">符合使用者搜尋習慣的 <mark>字典檔</mark></li>
-				<li class="next">ik 可以設定自動更新字典檔,無需重啟 Elasticsearch Server</li>
+				<li class="next">ik 可以設定自動更新字典檔，無需重啟 Elasticsearch Server</li>
 			</ol>
 		</ol>
 		<style>
@@ -454,7 +490,7 @@
 			<ol>
 				<li class="next">Google Analytics 站內搜尋</li>
 				<li class="next">搜尋後停留的時間極短，或搜尋離開 <mark>100%</mark></li>
-				<li class="next">但要小心, 不一定是加字典檔就能解決</li>
+				<li class="next">但要小心，不一定是加字典檔就能解決</li>
 			</ol>
 		</ol>
 	</section>
@@ -467,11 +503,11 @@
 	<section class="slide">
 		<h2>一些關於 Query DSL 的小事</h2>
 		<ol>
-			<li>如何決定哪些詞要被加到字典檔?</mark></li>
+			<li>如何決定哪些詞要被加到字典檔？</mark></li>
 			<ol>
 				<li>Google Analytics 站內搜尋</li>
 				<li>搜尋後停留的時間極短，或搜尋離開 <mark>100%</mark></li>
-				<li>但要小心, 不一定是加字典檔就能解決</li>
+				<li>但要小心，不一定是加字典檔就能解決</li>
 				<li class="next">搜尋建議</li>
 			</ol>
 		</ol>
@@ -482,15 +518,16 @@
 	<section class="slide">
 		<h2>一些關於 Query DSL 的小事</h2>
 		<ol>
-			<li>如何決定哪些詞要被加到字典檔?</mark></li>
-			<ol>
-				<li>Google Analytics 站內搜尋</li>
-				<li>搜尋後停留的時間極短，或搜尋離開 <mark>100%</mark></li>
-				<li>但要小心, 不一定是加字典檔就能解決</li>
-				<li>搜尋建議</li>
-				<li class="next">搜尋優化沒有結束的一天...</li>
-			</ol>
-			<li class="next">Mapping 是否設定<mark>"index": "not_analyzed"</mark></li>
+			<li>
+				如何決定哪些詞要被加到字典檔？
+				<ol>
+					<li>Google Analytics 站內搜尋</li>
+					<li>搜尋後停留的時間極短，或搜尋離開 <mark>100%</mark></li>
+					<li>但要小心，不一定是加字典檔就能解決</li>
+					<li>搜尋建議</li>
+					<li class="next">搜尋優化沒有結束的一天...</li>
+				</ol>
+			</li>
 		</ol>
 	</section>
 	<section class="slide sub-cover">
@@ -503,6 +540,116 @@
 				color: #fff;
 				text-align: center;
 				font-size: 50px;
+			}
+		</style>
+	</section>
+	<section class="slide">
+		<h2>搜尋建議</h2>
+		<pre class="next">
+			<code>POST <mark>_suggest</mark></code>
+			<code>{</code>
+			<code>    "suggest" : {</code>
+			<code>        "text" : "台",</code>
+			<code>        "completion" : {</code>
+			<code>            "field" : "name",</code>
+			<code>            "size": 10</code>
+			<code>        }</code>
+			<code>    }</code>
+			<code>}</code>
+		</pre>
+		<style>
+			.slide pre code {
+				font-size: 1em;
+			}
+		</style>
+	</section>
+	<section class="slide">
+		<h2>相關新聞</h2>
+		<ol>
+			<li class="next">原本: 同類別下隨機抓取 n 則新聞</li>
+			<li class="next">修正: 分析內文，取得真正相關的新聞</li>
+		</ol>
+	</section>
+	<section class="slide">
+		<img src="pictures/relatedNews1.png" class="cover">
+	</section>
+	<section class="slide">
+		<img src="pictures/relatedNews2.png" class="cover">
+	</section>
+	<section class="slide">
+		<img src="pictures/relatedNews3.jpg" class="cover">
+	</section>
+	<section class="slide">
+		<img src="pictures/relatedNews.png" class="cover">
+	</section>
+	<section class="slide">
+		<h2>新聞列表</h2>
+		<ol>
+			<li></li>
+		</ol>
+		<table class="next">
+			<tr>
+				<th scope="col">API</th>
+				<th>From Model</th>
+				<th>From Elasticsearch</th>
+			</tr>
+			<tr>
+				<td>/api/v1/news/headline</td>
+				<td></td>
+				<td></td>
+			</tr>
+			<tr>
+				<td>/api/v1/news/24h</td>
+				<td></td>
+				<td></td>
+			</tr>
+			<tr>
+				<td>/api/v1/news/popular</td>
+				<td></td>
+				<td></td>
+			</tr>
+			<tr>
+				<td>/api/v1/news/category/131</td>
+				<td></td>
+				<td></td>
+			</tr>
+		</table>
+	</section>
+	<section class="slide sub-cover">
+		<h2>看 code 時間</h2>
+		<img src="pictures/code.jpg" class="cover">
+		<style>
+			.sub-cover h2 {
+				margin: 400px 0 0;
+				padding: 10px;
+				color: #fff;
+				text-align: center;
+				font-size: 50px;
+			}
+		</style>
+	</section>
+	<section class="slide">
+		<h2>幾件必須做的基礎工程</h2>
+		<ol>
+			<li class="next">在 Laravel 中整合 Elasticsearch</li>
+			<ol>
+				<li class="next">Full Re-build: 有機會重新分析資料</li>
+				<ol>
+					<li class="next">Command: <code>php artisan elasticsearch:all --v</code></li>
+				</ol>
+				<li class="next">Wrapper: 串官方的 library，方便打 API</li>
+				<li class="next">Synchronization: 即時同步 CMS 新增/修改/刪除 動作</li>
+				<ol>
+					<li class="next">Full Re-build 時，用 Cache 通知同步動作要同時發生在新的與舊的 index</code></li>
+				</ol>
+			</ol>
+		</ol>
+		<style>
+			ol ol {
+				list-style-type: disc;
+			}
+			.slide ol ol>li::before {
+				content: '';
 			}
 		</style>
 	</section>
